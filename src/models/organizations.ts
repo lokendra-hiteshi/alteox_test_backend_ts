@@ -1,19 +1,16 @@
 import { DataTypes, Model, Optional } from "sequelize";
 import { sequelize } from "../config/dbConfig";
 
-// Define the attributes for the Organization model
 interface OrganizationAttributes {
   id: number;
   name: string;
-  createdAt?: Date;
-  updatedAt?: Date;
+  created_at?: Date;
+  updated_at?: Date;
 }
 
-// Define optional attributes for creation
 interface OrganizationCreationAttributes
   extends Optional<OrganizationAttributes, "id"> {}
 
-// Extend Sequelize's Model class
 class Organization
   extends Model<OrganizationAttributes, OrganizationCreationAttributes>
   implements OrganizationAttributes
@@ -21,12 +18,10 @@ class Organization
   public id!: number;
   public name!: string;
 
-  // Timestamps
-  public readonly createdAt!: Date;
-  public readonly updatedAt!: Date;
+  public readonly created_at!: Date;
+  public readonly updated_at!: Date;
 }
 
-// Define the Organization model with sequelize
 Organization.init(
   {
     id: {
@@ -42,6 +37,7 @@ Organization.init(
   {
     sequelize,
     modelName: "Organization",
+    tableName: "organizations",
     timestamps: true,
   }
 );

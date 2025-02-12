@@ -8,7 +8,7 @@ export const addFavoritePokemon = async (
   const { pokemonId } = req.body;
 
   try {
-    const user = res.locals.user;
+    const user = req?.user;
     if (!user || !pokemonId) {
       res.status(400).json({ message: "Invalid request" });
       return;
@@ -22,7 +22,7 @@ export const addFavoritePokemon = async (
 
     const userRecord = await db.User.findOne({
       where: { email: user.email },
-      attributes: ["id"],
+      attributes: ["id", "organization_id"],
     });
 
     if (!userRecord) {
@@ -30,14 +30,26 @@ export const addFavoritePokemon = async (
       return;
     }
 
+    const pokemonInfo = await db.Pokemon.findOne({
+      where: { id: pokemonId },
+      attributes: ["organization_id"],
+    });
+
+    if (pokemonInfo?.organization_id !== userRecord?.organization_id) {
+      res
+        .status(404)
+        .json({ message: "Invalid pokemon, not found in organization" });
+      return;
+    }
+
     const userId = userRecord.id;
 
-    let favorite = await db.Favorite.findOne({ where: { userId } });
+    let favorite = await db.Favorite.findOne({ where: { user_id: userId } });
 
     if (favorite) {
-      const updatedPokemonIds = new Set(favorite.pokemonIds);
+      const updatedPokemonIds = new Set(favorite.pokemon_ids);
       updatedPokemonIds.add(intPokemonId);
-      await favorite.update({ pokemonIds: Array.from(updatedPokemonIds) });
+      await favorite.update({ pokemon_ids: Array.from(updatedPokemonIds) });
 
       res.status(200).json({
         message: "Pokemon added to favorites",
@@ -45,8 +57,8 @@ export const addFavoritePokemon = async (
       });
     } else {
       favorite = await db.Favorite.create({
-        userId,
-        pokemonIds: [intPokemonId],
+        user_id: userId,
+        pokemon_ids: [intPokemonId],
       });
 
       res.status(201).json({
@@ -67,7 +79,7 @@ export const removeFavoritePokemon = async (
   const { pokemonId } = req.body;
 
   try {
-    const user = res.locals.user;
+    const user = req?.user;
     if (!user || !pokemonId) {
       res.status(400).json({ message: "Invalid request" });
       return;
@@ -81,7 +93,7 @@ export const removeFavoritePokemon = async (
 
     const userRecord = await db.User.findOne({
       where: { email: user.email },
-      attributes: ["id"],
+      attributes: ["id", "organization_id"],
     });
 
     if (!userRecord) {
@@ -89,16 +101,28 @@ export const removeFavoritePokemon = async (
       return;
     }
 
+    const pokemonInfo = await db.Pokemon.findOne({
+      where: { id: pokemonId },
+      attributes: ["organization_id"],
+    });
+
+    if (pokemonInfo?.organization_id !== userRecord?.organization_id) {
+      res
+        .status(404)
+        .json({ message: "Invalid pokemon, not found in organization" });
+      return;
+    }
+
     const userId = userRecord.id;
 
-    const favorite = await db.Favorite.findOne({ where: { userId } });
+    const favorite = await db.Favorite.findOne({ where: { user_id: userId } });
 
     if (!favorite) {
       res.status(404).json({ message: "No favorites found for this user" });
       return;
     }
 
-    const updatedPokemonIds = favorite.pokemonIds.filter(
+    const updatedPokemonIds = favorite.pokemon_ids.filter(
       (id: number) => id !== intPokemonId
     );
 
@@ -108,7 +132,7 @@ export const removeFavoritePokemon = async (
         .status(200)
         .json({ message: "Favorite list deleted as no Pokémon remained" });
     } else {
-      await favorite.update({ pokemonIds: updatedPokemonIds });
+      await favorite.update({ pokemon_ids: updatedPokemonIds });
       res.status(200).json({
         message: "Pokemon removed from favorites",
         favorite,

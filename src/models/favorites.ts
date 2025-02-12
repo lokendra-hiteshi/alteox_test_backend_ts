@@ -4,10 +4,10 @@ import { sequelize } from "../config/dbConfig";
 // Define the attributes for the Favorite model
 interface FavoriteAttributes {
   id: number;
-  userId: number;
-  pokemonIds: number[]; // Array of Pokemon IDs
-  createdAt?: Date;
-  updatedAt?: Date;
+  user_id: number;
+  pokemon_ids: number[]; // Array of Pokemon IDs
+  created_at?: Date;
+  updated_at?: Date;
 }
 
 // Define optional attributes for creation
@@ -20,12 +20,12 @@ class Favorite
   implements FavoriteAttributes
 {
   public id!: number;
-  public userId!: number;
-  public pokemonIds!: number[];
+  public user_id!: number;
+  public pokemon_ids!: number[];
 
   // Timestamps
-  public readonly createdAt!: Date;
-  public readonly updatedAt!: Date;
+  public readonly created_at!: Date;
+  public readonly updated_at!: Date;
 }
 
 // Define the Favorite model with sequelize
@@ -36,14 +36,14 @@ Favorite.init(
       primaryKey: true,
       autoIncrement: true,
     },
-    userId: {
+    user_id: {
       type: DataTypes.INTEGER,
       references: {
-        model: "Users",
+        model: "users",
         key: "id",
       },
     },
-    pokemonIds: {
+    pokemon_ids: {
       type: DataTypes.JSONB,
       allowNull: false,
       defaultValue: [],
@@ -52,6 +52,8 @@ Favorite.init(
   {
     sequelize,
     modelName: "Favorite",
+    tableName: "favorites",
+
     timestamps: true,
   }
 );

@@ -2,6 +2,7 @@ import { Request, Response } from "express";
 import { faker } from "@faker-js/faker";
 import { generateToken } from "../helpers/jwt";
 import { db } from "../models";
+import bcrypt from "bcrypt";
 
 export const generateUsersForOrganizations = async (
   req: Request,
@@ -45,7 +46,7 @@ export const getCurrentUser = async (
   res: Response
 ): Promise<void> => {
   try {
-    const email = res.locals.user?.email;
+    const email = req?.user;
 
     if (!email) {
       res.status(400).json({ error: "User email is missing" });
@@ -85,7 +86,8 @@ export const loginUser = async (req: Request, res: Response): Promise<void> => {
       res.status(404).json({ error: "Invalid email" });
       return;
     }
-    if (user.password !== password) {
+    const isPasswordValid = await bcrypt.compare(password, user?.password);
+    if (!isPasswordValid) {
       res.status(401).json({ error: "Invalid password" });
       return;
     }
@@ -120,11 +122,11 @@ export const registerUser = async (
       res.status(400).json({ error: "Invalid organization ID" });
       return;
     }
-
+    const hashedPassword = await bcrypt.hash(password, 10);
     await db.User.create({
       email,
-      password,
-      organizationId: orgId,
+      password: hashedPassword,
+      organization_id: orgId,
     });
 
     res.status(201).json({

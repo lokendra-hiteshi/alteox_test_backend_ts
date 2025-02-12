@@ -6,38 +6,38 @@ import Favorite from "./favorites";
 import Dislike from "./dislike";
 
 Organization.hasMany(User, {
-  foreignKey: "organizationId",
+  foreignKey: "organization_id",
   onDelete: "CASCADE",
 });
 
 User.belongsTo(Organization, {
-  foreignKey: "organizationId",
+  foreignKey: "organization_id",
 });
 
 Organization.hasMany(Pokemon, {
-  foreignKey: "organizationId",
+  foreignKey: "organization_id",
   onDelete: "CASCADE",
 });
 
 Pokemon.belongsTo(Organization, {
-  foreignKey: "organizationId",
+  foreignKey: "organization_id",
 });
 
 User.hasOne(Favorite, {
-  foreignKey: "userId",
+  foreignKey: "user_id",
   onDelete: "CASCADE",
 });
 
 Favorite.belongsTo(User, {
-  foreignKey: "userId",
+  foreignKey: "user_id",
 });
 
 User.hasOne(Dislike, {
-  foreignKey: "userId",
+  foreignKey: "user_id",
 });
 
 Dislike.belongsTo(User, {
-  foreignKey: "userId",
+  foreignKey: "user_id",
 });
 
 export const db = {

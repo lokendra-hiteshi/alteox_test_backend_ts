@@ -1,33 +1,28 @@
 import { DataTypes, Model, Optional } from "sequelize";
 import { sequelize } from "../config/dbConfig";
 
-// Define the attributes for the Dislike model
 interface DislikeAttributes {
   id: number;
-  userId: number;
-  pokemonIds: number[];
-  createdAt?: Date;
-  updatedAt?: Date;
+  user_id: number;
+  pokemon_ids: number[];
+  created_at?: Date;
+  updated_at?: Date;
 }
 
-// Define optional attributes for creation
 interface DislikeCreationAttributes extends Optional<DislikeAttributes, "id"> {}
 
-// Extend Sequelize's Model class
 class Dislike
   extends Model<DislikeAttributes, DislikeCreationAttributes>
   implements DislikeAttributes
 {
   public id!: number;
-  public userId!: number;
-  public pokemonIds!: number[];
+  public user_id!: number;
+  public pokemon_ids!: number[];
 
-  // Timestamps
-  public readonly createdAt!: Date;
-  public readonly updatedAt!: Date;
+  public readonly created_at!: Date;
+  public readonly updated_at!: Date;
 }
 
-// Define the Dislike model with sequelize
 Dislike.init(
   {
     id: {
@@ -35,14 +30,14 @@ Dislike.init(
       primaryKey: true,
       autoIncrement: true,
     },
-    userId: {
+    user_id: {
       type: DataTypes.INTEGER,
       references: {
-        model: "Users",
+        model: "users",
         key: "id",
       },
     },
-    pokemonIds: {
+    pokemon_ids: {
       type: DataTypes.JSONB,
       allowNull: false,
       defaultValue: [],
@@ -51,6 +46,7 @@ Dislike.init(
   {
     sequelize,
     modelName: "Dislike",
+    tableName: "dislikes",
     timestamps: true,
   }
 );

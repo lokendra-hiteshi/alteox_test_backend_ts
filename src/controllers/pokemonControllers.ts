@@ -27,9 +27,9 @@ export const generatePokemon = async (
 
         return {
           name,
-          imageUrl: sprites.front_default,
-          organizationId: orgIds[Math.floor(Math.random() * orgIds.length)],
-          pokemonType: types[0]?.type?.name,
+          image_url: sprites.front_default,
+          organization_id: orgIds[Math.floor(Math.random() * orgIds.length)],
+          pokemon_type: types[0]?.type?.name,
         };
       } catch (error: any) {
         console.warn(`Failed to fetch Pokémon ID ${id}:`, error.message);
@@ -44,9 +44,9 @@ export const generatePokemon = async (
       Boolean
     ) as Array<{
       name: string;
-      imageUrl: string;
-      organizationId: number;
-      pokemonType: string;
+      image_url: string;
+      organization_id: number;
+      pokemon_type: string;
     }>;
 
     if (pokemonData.length > 0) {
@@ -68,10 +68,10 @@ export const getAllPokemonByOrganization = async (
   res: Response
 ): Promise<void> => {
   try {
-    const user = res?.locals?.user;
+    const user = req?.user;
 
     if (!user?.email) {
-      res.status(401).json({ error: "Unauthorized" });
+      res.status(401).json({ error: "Unauthorized user" });
       return;
     }
 
@@ -89,25 +89,25 @@ export const getAllPokemonByOrganization = async (
       (parseInt(page as string, 10) - 1) * parseInt(limit as string, 10);
 
     const favorite = await db.Favorite.findOne({
-      where: { userId: userInfo.id },
-      attributes: ["pokemonIds"],
+      where: { user_id: userInfo.id },
+      attributes: ["pokemon_ids"],
     });
 
     const favoritePokemonIds = favorite
-      ? new Set(favorite.pokemonIds)
+      ? new Set(favorite.pokemon_ids)
       : new Set<number>();
 
     const disliked = await db.Dislike.findOne({
-      where: { userId: userInfo.id },
-      attributes: ["pokemonIds"],
+      where: { user_id: userInfo.id },
+      attributes: ["pokemon_ids"],
     });
 
     const disLikedPokemonIds = disliked
-      ? new Set(disliked.pokemonIds)
+      ? new Set(disliked.pokemon_ids)
       : new Set<number>();
 
     const { count, rows: pokemons } = await db.Pokemon.findAndCountAll({
-      where: { organizationId: userInfo.organizationId },
+      where: { organization_id: userInfo.organization_id },
       limit: parseInt(limit as string, 10),
       offset: offset,
     });

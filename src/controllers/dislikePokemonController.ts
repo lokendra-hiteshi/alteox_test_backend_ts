@@ -8,7 +8,7 @@ export const dislikePokemon = async (
   const { pokemonId } = req.body;
 
   try {
-    const user = res.locals.user;
+    const user = req?.user;
 
     if (!user || !pokemonId) {
       res.status(400).json({ message: "Invalid request" });
@@ -23,7 +23,7 @@ export const dislikePokemon = async (
     }
 
     const userRecord = await db.User.findOne({
-      where: { email: user.email },
+      where: { email: user?.email },
       attributes: ["id"],
     });
 
@@ -34,12 +34,12 @@ export const dislikePokemon = async (
 
     const userId = userRecord.id;
 
-    let disliked = await db.Dislike.findOne({ where: { userId } });
+    let disliked = await db.Dislike.findOne({ where: { user_id: userId } });
 
     if (disliked) {
-      const updatedPokemonIds = new Set(disliked.pokemonIds);
+      const updatedPokemonIds = new Set(disliked.pokemon_ids);
       updatedPokemonIds.add(intPokemonId);
-      await disliked.update({ pokemonIds: Array.from(updatedPokemonIds) });
+      await disliked.update({ pokemon_ids: Array.from(updatedPokemonIds) });
 
       res.status(200).json({
         message: "Pokemon disliked successfully",
@@ -47,8 +47,8 @@ export const dislikePokemon = async (
       });
     } else {
       disliked = await db.Dislike.create({
-        userId,
-        pokemonIds: [intPokemonId],
+        user_id: userId,
+        pokemon_ids: [intPokemonId],
       });
 
       res.status(201).json({
@@ -69,7 +69,7 @@ export const removeDislikePokemon = async (
   const { pokemonId } = req.body;
 
   try {
-    const user = res.locals.user;
+    const user = req?.user;
     if (!user || !pokemonId) {
       res.status(400).json({ message: "Invalid request" });
       return;
@@ -93,7 +93,7 @@ export const removeDislikePokemon = async (
 
     const userId = userRecord.id;
 
-    const disliked = await db.Dislike.findOne({ where: { userId } });
+    const disliked = await db.Dislike.findOne({ where: { user_id: userId } });
 
     if (!disliked) {
       res
@@ -102,7 +102,7 @@ export const removeDislikePokemon = async (
       return;
     }
 
-    const updatedPokemonIds = disliked.pokemonIds.filter(
+    const updatedPokemonIds = disliked.pokemon_ids.filter(
       (id: number) => id !== intPokemonId
     );
 
@@ -112,7 +112,7 @@ export const removeDislikePokemon = async (
         .status(200)
         .json({ message: "Dislike list deleted as no Pokémon remained" });
     } else {
-      await disliked.update({ pokemonIds: updatedPokemonIds });
+      await disliked.update({ pokemon_ids: updatedPokemonIds });
       res.status(200).json({
         message: "Pokemon removed from disliked list",
         disliked,

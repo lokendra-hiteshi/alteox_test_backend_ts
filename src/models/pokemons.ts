@@ -4,11 +4,11 @@ import { sequelize } from "../config/dbConfig";
 interface PokemonAttributes {
   id: number;
   name: string;
-  imageUrl: string;
-  pokemonType: string;
-  organizationId: number;
-  createdAt?: Date;
-  updatedAt?: Date;
+  image_url: string;
+  pokemon_type: string;
+  organization_id: number;
+  created_at?: Date;
+  updated_at?: Date;
 }
 
 interface PokemonCreationAttributes extends Optional<PokemonAttributes, "id"> {}
@@ -19,11 +19,11 @@ class Pokemon
 {
   public id!: number;
   public name!: string;
-  public imageUrl!: string;
-  public pokemonType!: string;
-  public organizationId!: number;
-  public readonly createdAt!: Date;
-  public readonly updatedAt!: Date;
+  public image_url!: string;
+  public pokemon_type!: string;
+  public organization_id!: number;
+  public readonly created_at!: Date;
+  public readonly updated_at!: Date;
 }
 
 Pokemon.init(
@@ -37,18 +37,18 @@ Pokemon.init(
       type: DataTypes.STRING,
       allowNull: false,
     },
-    imageUrl: {
+    image_url: {
       type: DataTypes.STRING,
       allowNull: false,
     },
-    pokemonType: {
+    pokemon_type: {
       type: DataTypes.STRING,
       allowNull: true,
     },
-    organizationId: {
+    organization_id: {
       type: DataTypes.INTEGER,
       references: {
-        model: "Organizations",
+        model: "organizations",
         key: "id",
       },
     },
@@ -56,6 +56,7 @@ Pokemon.init(
   {
     sequelize,
     modelName: "Pokemon",
+    tableName: "pokemons",
     timestamps: true,
   }
 );

@@ -5,9 +5,9 @@ interface UserAttributes {
   id: number;
   email: string;
   password: string;
-  organizationId?: number;
-  createdAt?: Date;
-  updatedAt?: Date;
+  organization_id?: number;
+  created_at?: Date;
+  updated_at?: Date;
 }
 
 interface UserCreationAttributes extends Optional<UserAttributes, "id"> {}
@@ -19,10 +19,10 @@ class User
   public id!: number;
   public email!: string;
   public password!: string;
-  public organizationId?: number;
+  public organization_id?: number;
 
-  public readonly createdAt!: Date;
-  public readonly updatedAt!: Date;
+  public readonly created_at!: Date;
+  public readonly updated_at!: Date;
 }
 
 User.init(
@@ -44,17 +44,18 @@ User.init(
       type: DataTypes.STRING,
       allowNull: false,
     },
-    organizationId: {
+    organization_id: {
       type: DataTypes.INTEGER,
       references: {
-        model: "Organizations",
+        model: "organizations",
         key: "id",
       },
     },
   },
   {
     sequelize,
-    tableName: "Users",
+    modelName: "Users",
+    tableName: "users",
     timestamps: true,
   }
 );

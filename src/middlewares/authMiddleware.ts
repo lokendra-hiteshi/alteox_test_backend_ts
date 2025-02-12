@@ -15,7 +15,7 @@ export const authenticate = (
 
   try {
     const decoded = verifyToken(token);
-    res.locals.user = decoded;
+    req.user = decoded;
 
     next();
   } catch (error) {
