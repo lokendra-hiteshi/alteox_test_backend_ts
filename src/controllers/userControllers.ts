@@ -13,7 +13,7 @@ export const generateUsersForOrganizations = async (
     const totalUsers: Array<{
       email: string;
       password: string;
-      organizationId: number;
+      organization_id: number;
     }> = [];
 
     for (const organization of organizations) {
@@ -21,10 +21,12 @@ export const generateUsersForOrganizations = async (
         const userEmail = faker.internet.email();
         const userPassword = faker.internet.password();
 
+        const hashedPassword = await bcrypt.hash(userPassword, 10);
+
         totalUsers.push({
           email: userEmail,
-          password: userPassword,
-          organizationId: organization.id,
+          password: hashedPassword,
+          organization_id: organization.id,
         });
       }
     }
@@ -46,7 +48,7 @@ export const getCurrentUser = async (
   res: Response
 ): Promise<void> => {
   try {
-    const email = req?.user;
+    const email = req?.user?.email;
 
     if (!email) {
       res.status(400).json({ error: "User email is missing" });
